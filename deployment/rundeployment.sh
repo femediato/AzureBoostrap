@@ -43,10 +43,10 @@ az group create --name "${RGNAME}" --location "${RGLOCATION}"
 
 # it runs the arm template deployment passing the dns name of gateway
 # the certificate and its password 
-az group deployment create --resource-group $RGNAME --template-uri ${DEPLOYMENT}webappdeploy.json --parameters VotingWeb_name=${DNSNAME} SqlConnectionString="$sqlcon" 
+az group deployment create --resource-group $RGNAME --template-uri ${DEPLOYMENT}azureBootstrapDeploy.json 
 
-cosmosacc=`az cosmosdb list -g ${RGNAME} | jq -r .[0].name`
+#cosmosacc=`az cosmosdb list -g ${RGNAME} | jq -r .[0].name`
 
-az cosmosdb database create -d cacheDB -n ${cosmosacc} -g ${RGNAME}
+#az cosmosdb database create -d cacheDB -n ${cosmosacc} -g ${RGNAME}
 
-az cosmosdb collection create --name ${cosmosacc} -c cacheContainer -g ${RGNAME} --db-name cacheDB --partition-key-path '/MessageType'
+#az cosmosdb collection create --name ${cosmosacc} -c cacheContainer -g ${RGNAME} --db-name cacheDB --partition-key-path '/MessageType'
