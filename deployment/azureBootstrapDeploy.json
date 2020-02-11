@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "databaseAccounts_cosmos_azurebootstrap_name": {
-        "defaultValue": "cosmos-azurebootstrap",
+        "defaultValue": "cosmos-azurebootstrap2",
         "type": "String"
     }
   },
