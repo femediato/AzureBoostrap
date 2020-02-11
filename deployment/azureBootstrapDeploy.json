@@ -1,0 +1,133 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "databaseAccounts_cosmos_azurebootstrap_name": {
+        "defaultValue": "cosmos-azurebootstrap",
+        "type": "String"
+    }
+  },
+
+  "variables": {
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+        "type": "Microsoft.DocumentDB/databaseAccounts",
+        "apiVersion": "2019-12-12",
+        "name": "[parameters('databaseAccounts_cosmos_azurebootstrap_name')]",
+        "location": "[variables('location')]",
+        "tags": {
+            "defaultExperience": "Core (SQL)",
+            "hidden-cosmos-mmspecial": ""
+        },
+        "kind": "GlobalDocumentDB",
+        "properties": {
+            "enableAutomaticFailover": false,
+            "enableMultipleWriteLocations": false,
+            "isVirtualNetworkFilterEnabled": false,
+            "virtualNetworkRules": [],
+            "disableKeyBasedMetadataWriteAccess": false,
+            "databaseAccountOfferType": "Standard",
+            "consistencyPolicy": {
+                "defaultConsistencyLevel": "Session",
+                "maxIntervalInSeconds": 5,
+                "maxStalenessPrefix": 100
+            },
+            "locations": [
+                {
+                    "locationName": "[variables('location')]",
+                    "provisioningState": "Succeeded",
+                    "failoverPriority": 0,
+                    "isZoneRedundant": false
+                }
+            ],
+            "capabilities": []
+        }
+    },
+    {
+        "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+        "apiVersion": "2019-12-12",
+        "name": "[concat(parameters('databaseAccounts_cosmos_azurebootstrap_name'), '/ToDoList')]",
+        "dependsOn": [
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cosmos_azurebootstrap_name'))]"
+        ],
+        "properties": {
+            "resource": {
+                "id": "ToDoList"
+            },
+            "options": {}
+        }
+    },
+    {
+        "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+        "apiVersion": "2019-12-12",
+        "name": "[concat(parameters('databaseAccounts_cosmos_azurebootstrap_name'), '/ToDoList/Items')]",
+        "dependsOn": [
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_cosmos_azurebootstrap_name'), 'ToDoList')]",
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cosmos_azurebootstrap_name'))]"
+        ],
+        "properties": {
+            "resource": {
+                "id": "Items",
+                "indexingPolicy": {
+                    "indexingMode": "consistent",
+                    "automatic": true,
+                    "includedPaths": [
+                        {
+                            "path": "/*",
+                            "indexes": [
+                                {
+                                    "kind": "Range",
+                                    "dataType": "Number",
+                                    "precision": -1
+                                },
+                                {
+                                    "kind": "Range",
+                                    "dataType": "String",
+                                    "precision": -1
+                                },
+                                {
+                                    "kind": "Spatial",
+                                    "dataType": "Point"
+                                }
+                            ]
+                        }
+                    ],
+                    "excludedPaths": [
+                        {
+                            "path": "/\"_etag\"/?"
+                        }
+                    ]
+                },
+                "conflictResolutionPolicy": {
+                    "mode": "LastWriterWins",
+                    "conflictResolutionPath": "/_ts"
+                }
+            },
+            "options": {}
+        }
+    },
+    {
+        "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings",
+        "apiVersion": "2019-12-12",
+        "name": "[concat(parameters('databaseAccounts_cosmos_azurebootstrap_name'), '/ToDoList/Items/default')]",
+        "dependsOn": [
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('databaseAccounts_cosmos_azurebootstrap_name'), 'ToDoList', 'Items')]",
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_cosmos_azurebootstrap_name'), 'ToDoList')]",
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cosmos_azurebootstrap_name'))]"
+        ],
+        "properties": {
+            "resource": {
+                "throughput": 400
+            }
+        }
+    }
+  ],
+
+  "outputs": {
+
+
+  }
+
+}
