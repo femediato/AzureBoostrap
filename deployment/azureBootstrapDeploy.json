@@ -2,598 +2,463 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "sites_heroes_azure_name": {
-            "defaultValue": "[concat( 'heroes-azure-',uniqueString(resourceGroup().id) ) ]",
-            "type": "String"
-        },
-        "serverfarms_NorthEuropePlan_name": {
-            "defaultValue": "NorthEuropePlan",
-            "type": "String"
-        },
-        "components_heroes_azure_name": {
-            "defaultValue": "[concat( 'heroes-azure-',uniqueString(resourceGroup().id) ) ]",
-            "type": "String"
-        },
-        "sites_function_api_heroes20200211103713_name": {
-            "defaultValue": "[concat( 'func-api-heroes-',uniqueString(resourceGroup().id) ) ]",
-            "type": "String"
-        },
-        "serverfarms_ASP_rgfunctionapiheroes_84e9_name": {
-            "defaultValue": "ASP-rgfunctionapiheroes-84e9",
-            "type": "String"
-        },
-        "storageAccounts_functionapiheroes2020021_name": {
-            "defaultValue": "[concat( 'storage-func-api-heroes-',uniqueString(resourceGroup().id) ) ]",
-            "type": "String"
-        }
+      "sites_func_heroes_api_name": {
+        "defaultValue": "func-heroes-api",
+        "type": "String"
+      },
+      "sites_heroes_bootstrap_name": {
+        "defaultValue": "heroes-bootstrap",
+        "type": "String"
+      },
+      "components_func_heroes_api_name": {
+        "defaultValue": "func-heroes-api",
+        "type": "String"
+      },
+      "components_heroes_bootstrap_name": {
+        "defaultValue": "heroes-bootstrap",
+        "type": "String"
+      },
+      "serverfarms_ASP_rgheroesbootstrap_b3e9_name": {
+        "defaultValue": "ASP-rgheroesbootstrap-b3e9",
+        "type": "String"
+      },
+      "serverfarms_ASP_rgheroesbootstrap_b6fc_name": {
+        "defaultValue": "ASP-rgheroesbootstrap-b6fc",
+        "type": "String"
+      },
+      "storageAccounts_storageaccountrghera6c2_name": {
+        "defaultValue": "storageaccountrghera6c2",
+        "type": "String"
+      }
     },
     "variables": {
-		"location": "[resourceGroup().location]"
-	},
+      "location": "[resourceGroup().location]"
+    },
     "resources": [
-        {
-            "type": "microsoft.insights/components",
-            "apiVersion": "2015-05-01",
-            "name": "[parameters('components_heroes_azure_name')]",
-            "location": "[variables('location')]",
-            "kind": "web",
-            "properties": {
-                "Application_Type": "web",
-                "Request_Source": "IbizaWebAppExtensionCreate"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
-            "name": "[parameters('storageAccounts_functionapiheroes2020021_name')]",
-            "location": "[variables('location')]",
-            "tags": {
-                "hidden-related:/providers/Microsoft.Web/sites/function-api-heroes20200211103713": "empty"
-            },
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "Storage",
-            "properties": {
-                "networkAcls": {
-                    "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
-                    "ipRules": [],
-                    "defaultAction": "Allow"
-                },
-                "supportsHttpsTrafficOnly": false,
-                "encryption": {
-                    "services": {
-                        "file": {
-                            "keyType": "Account",
-                            "enabled": true
-                        },
-                        "blob": {
-                            "keyType": "Account",
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2018-02-01",
-            "name": "[parameters('serverfarms_ASP_rgfunctionapiheroes_84e9_name')]",
-            "location": "[variables('location')]",
-            "sku": {
-                "name": "S1",
-                "tier": "Standard",
-                "size": "S1",
-                "family": "S",
-                "capacity": 1
-            },
-            "kind": "app",
-            "properties": {
-                "perSiteScaling": false,
-                "maximumElasticWorkerCount": 1,
-                "isSpot": false,
-                "reserved": false,
-                "isXenon": false,
-                "hyperV": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
-            }
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2018-02-01",
-            "name": "[parameters('serverfarms_NorthEuropePlan_name')]",
-            "location": "[variables('location')]",
-            "sku": {
-                "name": "Y1",
-                "tier": "Dynamic",
-                "size": "Y1",
-                "family": "Y",
-                "capacity": 0
-            },
-            "kind": "functionapp",
-            "properties": {
-                "perSiteScaling": false,
-                "maximumElasticWorkerCount": 1,
-                "isSpot": false,
-                "reserved": false,
-                "isXenon": false,
-                "hyperV": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_functionapiheroes2020021_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_functionapiheroes2020021_name'))]"
-            ],
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                },
-                "deleteRetentionPolicy": {
-                    "enabled": false
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/fileServices",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_functionapiheroes2020021_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_functionapiheroes2020021_name'))]"
-            ],
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2018-11-01",
-            "name": "[parameters('sites_function_api_heroes20200211103713_name')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_NorthEuropePlan_name'))]"
-            ],
-            "kind": "functionapp",
-            "properties": {
-                "enabled": true,
-                "hostNameSslStates": [
-                    {
-                        "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Standard"
-                    },
-                    {
-                        "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '.scm.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Repository"
-                    }
-                ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_NorthEuropePlan_name'))]",
-                "reserved": false,
-                "isXenon": false,
-                "hyperV": false,
-                "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": false,
-                "clientCertEnabled": false,
-                "hostNamesDisabled": false,
-                "containerSize": 1536,
-                "dailyMemoryTimeQuota": 0,
-                "httpsOnly": true,
-                "redundancyMode": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2018-11-01",
-            "name": "[parameters('sites_heroes_azure_name')]",
-            "location": "North Europe",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_rgfunctionapiheroes_84e9_name'))]"
-            ],
-            "kind": "app",
-            "properties": {
-                "enabled": true,
-                "hostNameSslStates": [
-                    {
-                        "name": "[concat(parameters('sites_heroes_azure_name'), '.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Standard"
-                    },
-                    {
-                        "name": "[concat(parameters('sites_heroes_azure_name'), '.scm.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Repository"
-                    }
-                ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_rgfunctionapiheroes_84e9_name'))]",
-                "reserved": false,
-                "isXenon": false,
-                "hyperV": false,
-                "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": true,
-                "clientCertEnabled": false,
-                "hostNamesDisabled": false,
-                "containerSize": 0,
-                "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false,
-                "redundancyMode": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/web')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "numberOfWorkers": 1,
-                "defaultDocuments": [
-                    "Default.htm",
-                    "Default.html",
-                    "Default.asp",
-                    "index.htm",
-                    "index.html",
-                    "iisstart.htm",
-                    "default.aspx",
-                    "index.php"
-                ],
-                "netFrameworkVersion": "v4.0",
-                "phpVersion": "5.6",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$function-api-heroes20200211103713",
-                "scmType": "None",
-                "use32BitWorkerProcess": true,
-                "webSocketsEnabled": false,
-                "alwaysOn": false,
-                "managedPipelineMode": "Integrated",
-                "virtualApplications": [
-                    {
-                        "virtualPath": "/",
-                        "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": false
-                    }
-                ],
-                "loadBalancing": "LeastRequests",
-                "experiments": {
-                    "rampUpRules": []
-                },
-                "autoHealEnabled": false,
-                "cors": {
-                    "allowedOrigins": [
-                        "https://functions.azure.com",
-                        "https://functions-staging.azure.com",
-                        "https://functions-next.azure.com"
-                    ],
-                    "supportCredentials": false
-                },
-                "localMySqlEnabled": false,
-                "ipSecurityRestrictions": [
-                    {
-                        "ipAddress": "Any",
-                        "action": "Allow",
-                        "priority": 1,
-                        "name": "Allow all",
-                        "description": "Allow all access"
-                    }
-                ],
-                "scmIpSecurityRestrictions": [
-                    {
-                        "ipAddress": "Any",
-                        "action": "Allow",
-                        "priority": 1,
-                        "name": "Allow all",
-                        "description": "Allow all access"
-                    }
-                ],
-                "scmIpSecurityRestrictionsUseMain": false,
-                "http20Enabled": false,
-                "minTlsVersion": "1.2",
-                "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_heroes_azure_name'), '/web')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_heroes_azure_name'))]"
-            ],
-            "properties": {
-                "numberOfWorkers": 1,
-                "defaultDocuments": [
-                    "Default.htm",
-                    "Default.html",
-                    "Default.asp",
-                    "index.htm",
-                    "index.html",
-                    "iisstart.htm",
-                    "default.aspx",
-                    "index.php",
-                    "hostingstart.html"
-                ],
-                "netFrameworkVersion": "v4.0",
-                "phpVersion": "5.6",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$heroes-azure",
-                "scmType": "VSO",
-                "use32BitWorkerProcess": true,
-                "webSocketsEnabled": false,
-                "alwaysOn": true,
-                "managedPipelineMode": "Integrated",
-                "virtualApplications": [
-                    {
-                        "virtualPath": "/",
-                        "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": true
-                    }
-                ],
-                "loadBalancing": "LeastRequests",
-                "experiments": {
-                    "rampUpRules": []
-                },
-                "autoHealEnabled": false,
-                "localMySqlEnabled": false,
-                "ipSecurityRestrictions": [
-                    {
-                        "ipAddress": "Any",
-                        "action": "Allow",
-                        "priority": 1,
-                        "name": "Allow all",
-                        "description": "Allow all access"
-                    }
-                ],
-                "scmIpSecurityRestrictions": [
-                    {
-                        "ipAddress": "Any",
-                        "action": "Allow",
-                        "priority": 1,
-                        "name": "Allow all",
-                        "description": "Allow all access"
-                    }
-                ],
-                "scmIpSecurityRestrictionsUseMain": false,
-                "http20Enabled": false,
-                "minTlsVersion": "1.2",
-                "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/deployments",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/5b7d0fa350c04fcb8c6f7c6346b85175')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "status": 4,
-                "author_email": "N/A",
-                "author": "N/A",
-                "deployer": "Push-Deployer",
-                "message": "Created via a push deployment",
-                "start_time": "2020-02-11T22:40:35.7486223Z",
-                "end_time": "2020-02-11T22:40:39.9596816Z",
-                "active": true
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/CreateHero')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/CreateHero/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/CreateHero/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/CreateHero",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/CreateVillain')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/CreateVillain/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/CreateVillain/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/CreateVillain",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/DeleteTodo')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/DeleteTodo/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/DeleteTodo/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/DeleteTodo",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/DeleteVillain')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/DeleteVillain/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/DeleteVillain/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/DeleteVillain",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/GetHeroes')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/GetHeroes/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/GetHeroes/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/GetHeroes",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/GetVillains')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/GetVillains/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/GetVillains/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/GetVillains",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/UpdateTodo')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/UpdateTodo/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/UpdateTodo/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/UpdateTodo",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/UpdateVillain')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/UpdateVillain/",
-                "script_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/bin/function-api-heroes.dll",
-                "config_href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/vfs/site/wwwroot/UpdateVillain/function.json",
-                "href": "https://function-api-heroes20200211103713.azurewebsites.net/admin/functions/UpdateVillain",
-                "config": {}
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_function_api_heroes20200211103713_name'), '/', parameters('sites_function_api_heroes20200211103713_name'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_function_api_heroes20200211103713_name'))]"
-            ],
-            "properties": {
-                "siteName": "function-api-heroes20200211103713",
-                "hostNameType": "Verified"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_heroes_azure_name'), '/', parameters('sites_heroes_azure_name'), '.azurewebsites.net')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_heroes_azure_name'))]"
-            ],
-            "properties": {
-                "siteName": "heroes-azure",
-                "hostNameType": "Verified"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_functionapiheroes2020021_name'), '/default/azure-webjobs-hosts')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_functionapiheroes2020021_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_functionapiheroes2020021_name'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_functionapiheroes2020021_name'), '/default/azure-webjobs-secrets')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_functionapiheroes2020021_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_functionapiheroes2020021_name'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_functionapiheroes2020021_name'), '/default/function-api-heroes20200211103713')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_functionapiheroes2020021_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_functionapiheroes2020021_name'))]"
-            ],
-            "properties": {
-                "shareQuota": 5120
-            }
+      {
+        "type": "microsoft.insights/components",
+        "apiVersion": "2015-05-01",
+        "name": "[parameters('components_func_heroes_api_name')]",
+        "location": "[variables('location')]",
+        "kind": "web",
+        "properties": {
+          "Application_Type": "web",
+          "Request_Source": "IbizaWebAppExtensionCreate"
         }
+      },
+      {
+        "type": "microsoft.insights/components",
+        "apiVersion": "2015-05-01",
+        "name": "[parameters('components_heroes_bootstrap_name')]",
+        "location": "[variables('location')]",
+        "kind": "web",
+        "properties": {
+          "Application_Type": "web",
+          "Request_Source": "IbizaWebAppExtensionCreate"
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2019-06-01",
+        "name": "[parameters('storageAccounts_storageaccountrghera6c2_name')]",
+        "location": "[variables('location')]",
+        "sku": {
+          "name": "Standard_LRS",
+          "tier": "Standard"
+        },
+        "kind": "Storage",
+        "properties": {
+          "networkAcls": {
+            "bypass": "AzureServices",
+            "virtualNetworkRules": [],
+            "ipRules": [],
+            "defaultAction": "Allow"
+          },
+          "supportsHttpsTrafficOnly": true,
+          "encryption": {
+            "services": {
+              "file": {
+                "keyType": "Account",
+                "enabled": true
+              },
+              "blob": {
+                "keyType": "Account",
+                "enabled": true
+              }
+            },
+            "keySource": "Microsoft.Storage"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2018-02-01",
+        "name": "[parameters('serverfarms_ASP_rgheroesbootstrap_b3e9_name')]",
+        "location": "[variables('location')]",
+        "sku": {
+          "name": "S1",
+          "tier": "Standard",
+          "size": "S1",
+          "family": "S",
+          "capacity": 1
+        },
+        "kind": "app",
+        "properties": {
+          "perSiteScaling": false,
+          "maximumElasticWorkerCount": 1,
+          "isSpot": false,
+          "reserved": false,
+          "isXenon": false,
+          "hyperV": false,
+          "targetWorkerCount": 0,
+          "targetWorkerSizeId": 0
+        }
+      },
+      {
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2018-02-01",
+        "name": "[parameters('serverfarms_ASP_rgheroesbootstrap_b6fc_name')]",
+        "location": "[variables('location')]",
+        "sku": {
+          "name": "Y1",
+          "tier": "Dynamic",
+          "size": "Y1",
+          "family": "Y",
+          "capacity": 0
+        },
+        "kind": "functionapp",
+        "properties": {
+          "perSiteScaling": false,
+          "maximumElasticWorkerCount": 1,
+          "isSpot": false,
+          "reserved": false,
+          "isXenon": false,
+          "hyperV": false,
+          "targetWorkerCount": 0,
+          "targetWorkerSizeId": 0
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/blobServices",
+        "apiVersion": "2019-06-01",
+        "name": "[concat(parameters('storageAccounts_storageaccountrghera6c2_name'), '/default')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountrghera6c2_name'))]"
+        ],
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "properties": {
+          "cors": {
+            "corsRules": []
+          },
+          "deleteRetentionPolicy": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/fileServices",
+        "apiVersion": "2019-06-01",
+        "name": "[concat(parameters('storageAccounts_storageaccountrghera6c2_name'), '/default')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountrghera6c2_name'))]"
+        ],
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "properties": {
+          "cors": {
+            "corsRules": []
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2018-11-01",
+        "name": "[parameters('sites_func_heroes_api_name')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_rgheroesbootstrap_b6fc_name'))]"
+        ],
+        "kind": "functionapp",
+        "properties": {
+          "enabled": true,
+          "hostNameSslStates": [
+            {
+              "name": "[concat(parameters('sites_func_heroes_api_name'), '.azurewebsites.net')]",
+              "sslState": "Disabled",
+              "hostType": "Standard"
+            },
+            {
+              "name": "[concat(parameters('sites_func_heroes_api_name'), '.scm.azurewebsites.net')]",
+              "sslState": "Disabled",
+              "hostType": "Repository"
+            }
+          ],
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_rgheroesbootstrap_b6fc_name'))]",
+          "reserved": false,
+          "isXenon": false,
+          "hyperV": false,
+          "scmSiteAlsoStopped": false,
+          "clientAffinityEnabled": true,
+          "clientCertEnabled": false,
+          "hostNamesDisabled": false,
+          "containerSize": 1536,
+          "dailyMemoryTimeQuota": 0,
+          "httpsOnly": false,
+          "redundancyMode": "None"
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2018-11-01",
+        "name": "[parameters('sites_heroes_bootstrap_name')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_rgheroesbootstrap_b3e9_name'))]"
+        ],
+        "kind": "app",
+        "properties": {
+          "enabled": true,
+          "hostNameSslStates": [
+            {
+              "name": "[concat(parameters('sites_heroes_bootstrap_name'), '.azurewebsites.net')]",
+              "sslState": "Disabled",
+              "hostType": "Standard"
+            },
+            {
+              "name": "[concat(parameters('sites_heroes_bootstrap_name'), '.scm.azurewebsites.net')]",
+              "sslState": "Disabled",
+              "hostType": "Repository"
+            }
+          ],
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_rgheroesbootstrap_b3e9_name'))]",
+          "reserved": false,
+          "isXenon": false,
+          "hyperV": false,
+          "scmSiteAlsoStopped": false,
+          "clientAffinityEnabled": true,
+          "clientCertEnabled": false,
+          "hostNamesDisabled": false,
+          "containerSize": 0,
+          "dailyMemoryTimeQuota": 0,
+          "httpsOnly": false,
+          "redundancyMode": "None"
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites/config",
+        "apiVersion": "2018-11-01",
+        "name": "[concat(parameters('sites_func_heroes_api_name'), '/web')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', parameters('sites_func_heroes_api_name'))]"
+        ],
+        "properties": {
+          "numberOfWorkers": 1,
+          "defaultDocuments": [
+            "Default.htm",
+            "Default.html",
+            "Default.asp",
+            "index.htm",
+            "index.html",
+            "iisstart.htm",
+            "default.aspx",
+            "index.php"
+          ],
+          "netFrameworkVersion": "v4.0",
+          "phpVersion": "5.6",
+          "requestTracingEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": false,
+          "logsDirectorySizeLimit": 35,
+          "detailedErrorLoggingEnabled": false,
+          "publishingUsername": "$func-heroes-api",
+          "scmType": "None",
+          "use32BitWorkerProcess": true,
+          "webSocketsEnabled": false,
+          "alwaysOn": false,
+          "managedPipelineMode": "Integrated",
+          "virtualApplications": [
+            {
+              "virtualPath": "/",
+              "physicalPath": "site\\wwwroot",
+              "preloadEnabled": false
+            }
+          ],
+          "loadBalancing": "LeastRequests",
+          "experiments": {
+            "rampUpRules": []
+          },
+          "autoHealEnabled": false,
+          "cors": {
+            "allowedOrigins": [
+              "https://functions.azure.com",
+              "https://functions-staging.azure.com",
+              "https://functions-next.azure.com"
+            ],
+            "supportCredentials": false
+          },
+          "localMySqlEnabled": false,
+          "ipSecurityRestrictions": [
+            {
+              "ipAddress": "Any",
+              "action": "Allow",
+              "priority": 1,
+              "name": "Allow all",
+              "description": "Allow all access"
+            }
+          ],
+          "scmIpSecurityRestrictions": [
+            {
+              "ipAddress": "Any",
+              "action": "Allow",
+              "priority": 1,
+              "name": "Allow all",
+              "description": "Allow all access"
+            }
+          ],
+          "scmIpSecurityRestrictionsUseMain": false,
+          "http20Enabled": false,
+          "minTlsVersion": "1.2",
+          "ftpsState": "AllAllowed",
+          "reservedInstanceCount": 0
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites/config",
+        "apiVersion": "2018-11-01",
+        "name": "[concat(parameters('sites_heroes_bootstrap_name'), '/web')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', parameters('sites_heroes_bootstrap_name'))]"
+        ],
+        "properties": {
+          "numberOfWorkers": 1,
+          "defaultDocuments": [
+            "Default.htm",
+            "Default.html",
+            "Default.asp",
+            "index.htm",
+            "index.html",
+            "iisstart.htm",
+            "default.aspx",
+            "index.php",
+            "hostingstart.html"
+          ],
+          "netFrameworkVersion": "v4.0",
+          "phpVersion": "5.6",
+          "requestTracingEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": false,
+          "logsDirectorySizeLimit": 35,
+          "detailedErrorLoggingEnabled": false,
+          "publishingUsername": "$heroes-bootstrap",
+          "scmType": "None",
+          "use32BitWorkerProcess": true,
+          "webSocketsEnabled": false,
+          "alwaysOn": true,
+          "managedPipelineMode": "Integrated",
+          "virtualApplications": [
+            {
+              "virtualPath": "/",
+              "physicalPath": "site\\wwwroot",
+              "preloadEnabled": true
+            }
+          ],
+          "loadBalancing": "LeastRequests",
+          "experiments": {
+            "rampUpRules": []
+          },
+          "autoHealEnabled": false,
+          "localMySqlEnabled": false,
+          "ipSecurityRestrictions": [
+            {
+              "ipAddress": "Any",
+              "action": "Allow",
+              "priority": 1,
+              "name": "Allow all",
+              "description": "Allow all access"
+            }
+          ],
+          "scmIpSecurityRestrictions": [
+            {
+              "ipAddress": "Any",
+              "action": "Allow",
+              "priority": 1,
+              "name": "Allow all",
+              "description": "Allow all access"
+            }
+          ],
+          "scmIpSecurityRestrictionsUseMain": false,
+          "http20Enabled": false,
+          "minTlsVersion": "1.2",
+          "ftpsState": "AllAllowed",
+          "reservedInstanceCount": 0
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites/hostNameBindings",
+        "apiVersion": "2018-11-01",
+        "name": "[concat(parameters('sites_func_heroes_api_name'), '/', parameters('sites_func_heroes_api_name'), '.azurewebsites.net')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', parameters('sites_func_heroes_api_name'))]"
+        ],
+        "properties": {
+          "siteName": "func-heroes-api",
+          "hostNameType": "Verified"
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites/hostNameBindings",
+        "apiVersion": "2018-11-01",
+        "name": "[concat(parameters('sites_heroes_bootstrap_name'), '/', parameters('sites_heroes_bootstrap_name'), '.azurewebsites.net')]",
+        "location": "[variables('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', parameters('sites_heroes_bootstrap_name'))]"
+        ],
+        "properties": {
+          "siteName": "heroes-bootstrap",
+          "hostNameType": "Verified"
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+        "apiVersion": "2019-06-01",
+        "name": "[concat(parameters('storageAccounts_storageaccountrghera6c2_name'), '/default/azure-webjobs-hosts')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountrghera6c2_name'), 'default')]",
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountrghera6c2_name'))]"
+        ],
+        "properties": {
+          "publicAccess": "None"
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+        "apiVersion": "2019-06-01",
+        "name": "[concat(parameters('storageAccounts_storageaccountrghera6c2_name'), '/default/azure-webjobs-secrets')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountrghera6c2_name'), 'default')]",
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountrghera6c2_name'))]"
+        ],
+        "properties": {
+          "publicAccess": "None"
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+        "apiVersion": "2019-06-01",
+        "name": "[concat(parameters('storageAccounts_storageaccountrghera6c2_name'), '/default/func-heroes-api92f5')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_storageaccountrghera6c2_name'), 'default')]",
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountrghera6c2_name'))]"
+        ],
+        "properties": {
+          "shareQuota": 5120
+        }
+      }
     ]
-}
+  }
