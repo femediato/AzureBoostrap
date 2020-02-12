@@ -43,7 +43,7 @@ az group create --name "${RGNAME}" --location "${RGLOCATION}"
 
 # it runs the arm template deployment passing the dns name of gateway
 # the certificate and its password 
-az group deployment create --resource-group $RGNAME --template-uri ${DEPLOYMENT}azureBootstrapDeploy.json 
+az group deployment create --resource-group $RGNAME --template-file azureBootstrapDeploy.json 
 
 #cosmosacc=`az cosmosdb list -g ${RGNAME} | jq -r .[0].name`
 
