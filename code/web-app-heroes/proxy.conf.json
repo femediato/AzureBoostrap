@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:7071",
-    "secure": false
+    "target": "https://function-api-heroes20200213014941.azurewebsites.net",
+    "secure": true
   }
 }
